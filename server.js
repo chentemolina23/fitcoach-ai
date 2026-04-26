@@ -6,27 +6,24 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
 
-// 1. PREP: Tell the server how to handle data (Middleware)
+// 1. PREP: Middlewre
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname))); // Tells server to look for index.html here
+app.use(express.static(path.join(__dirname))); 
 
 // 2. THE FRONT DOOR: Serve your website
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'fitcoach_rebrand_ai_workouts.html'));
 });
 
-// 3. THE AI KITCHEN: Your existing app.post('/api/generate'...) goes here
-// ... (the rest of your code)
+// 3. SET UP AI: Using the Environment Variable for security
+const genAI = new GoogleGenerativeAI(process.env.API_KEY || "YOUR_LOCAL_KEY_HERE");
 
-// Set up the Google AI 
-const genAI = new GoogleGenerativeAI("AIzaSyA93S-kbm2HxoRqJNt9I3KxWCOINYG3Oxw");
-
+// 4. THE AI KITCHEN: Processing the fitness plans
 app.post('/api/generate', async (req, res) => {
     try {
         const clientData = req.body;
         
-        // The AI's Brain (The System Prompt)
         const systemInstruction = `You are a supportive, holistic fitness guide and former professional soccer player. 
         Your coaching philosophy is organic, natural, and built on real-world athletic experience. 
         A client has provided you with their fitness goals and background. 
@@ -37,19 +34,22 @@ app.post('/api/generate', async (req, res) => {
 
         const prompt = `${systemInstruction}\n\nHere is the client's information:\nName: ${clientData.name}\nGoal: ${clientData.goal}\nDetails: ${clientData.details}\n\nPlease generate their custom plan.`;
 
-        // Using the active Gemini 2.5 Flash model
         const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-        
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
-        // Send the plan back to the website
         res.json({ plan: responseText });
 
     } catch (error) {
         console.error("Error generating plan:", error);
         res.status(500).json({ error: "Failed to generate plan." });
     }
+});
+
+// 5. THE ENGINE: Start the server (CRITICAL FOR RENDER)
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 const PORT = process.env.PORT || 3000;

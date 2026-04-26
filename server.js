@@ -1,11 +1,23 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
+
+// 1. PREP: Tell the server how to handle data (Middleware)
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.join(__dirname))); // Tells server to look for index.html here
+
+// 2. THE FRONT DOOR: Serve your website
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 3. THE AI KITCHEN: Your existing app.post('/api/generate'...) goes here
+// ... (the rest of your code)
 
 // Set up the Google AI 
 const genAI = new GoogleGenerativeAI("AIzaSyA93S-kbm2HxoRqJNt9I3KxWCOINYG3Oxw");
@@ -40,7 +52,7 @@ app.post('/api/generate', async (req, res) => {
     }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server is awake and listening on port ${PORT}!`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is live on port ${PORT}`);
 });

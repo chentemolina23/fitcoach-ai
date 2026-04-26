@@ -275,7 +275,7 @@ document.getElementById('ai-plan-form').addEventListener('submit', async (e) => 
   loading.style.display = "block";
 
   try {
-    const response = await fetch('http://localhost:3000/api/generate', {
+    const response = await fetch('/api/generate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, goal, details })
@@ -301,6 +301,7 @@ document.getElementById('ai-plan-form').addEventListener('submit', async (e) => 
   }
 });
 </script>
+
       <!-- CLIENTS -->
       <div class="tab" id="tab-clients">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">

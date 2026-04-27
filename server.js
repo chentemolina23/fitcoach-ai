@@ -24,7 +24,7 @@ app.post('/api/generate', async (req, res) => {
         const clientData = req.body;
         
         // Use the basic model that's available on all tiers
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
         
         const prompt = `You are a fitness coach. Design a workout plan for ${clientData.name} who wants to ${clientData.goal}. Details: ${clientData.details}`;
 

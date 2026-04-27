@@ -483,24 +483,29 @@ Return ONLY valid JSON (no markdown, no backticks) in this exact structure:
 }`;
 
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+    const resp=await fetch('/api/generate',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        messages:[{role:'user',content:prompt}]
+        name:client,
+        goal:goal,
+        details:`Sessions: ${sessions} per week\nLevel: ${level}\nEquipment: ${equip}\nNotes: ${notes}`
       })
     });
     const data=await resp.json();
-    const raw=data.content.find(b=>b.type==='text')?.text||'{}';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const plan=JSON.parse(clean);
-    renderPlan(plan,client);
+    if(data.plan){
+      document.getElementById('loading-state').style.display='none';
+      document.getElementById('plan-content').style.display='block';
+      document.getElementById('plan-content').innerHTML=data.plan;
+      document.getElementById('generate-btn').innerText='Plan Generated!';
+    }else{
+      throw new Error('No plan returned');
+    }
   }catch(e){
     document.getElementById('loading-state').style.display='none';
     document.getElementById('plan-content').style.display='block';
-    document.getElementById('plan-content').innerHTML='<div style="color:var(--terra3);font-size:12px;padding:20px 0">Unable to generate plan. Please try again.</div>';
+    document.getElementById('plan-content').innerHTML='<div style="color:var(--terra3);font-size:12px;padding:20px 0">Unable to generate plan. Is the server running?</div>';
+    document.getElementById('generate-btn').innerText='Try Again';
   }
 }
 
